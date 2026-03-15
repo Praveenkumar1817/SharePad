@@ -7,15 +7,11 @@ const lockTimer = {
         this.stop();
         this.endTime = new Date(lockedUntilStr).getTime();
         this.onExpireCallback = onExpire || null;
+        this.callbackFired = false;
         
-        const now = new Date().getTime();
-        if (this.endTime <= now) {
-            console.log("Lock already expired, not starting timer.");
-            return;
-        }
-
-        this.updateDisplay();
+        // Show UI immediately
         document.getElementById('lock-timer').classList.remove('hidden');
+        this.updateDisplay();
 
         this.intervalId = setInterval(() => {
             this.updateDisplay();
@@ -28,6 +24,7 @@ const lockTimer = {
             this.intervalId = null;
         }
         this.onExpireCallback = null;
+        this.callbackFired = false;
         document.getElementById('lock-timer').classList.add('hidden');
     },
 
@@ -36,11 +33,20 @@ const lockTimer = {
         const distance = this.endTime - now;
 
         if (distance <= 0) {
-            const callback = this.onExpireCallback;
-            this.stop();
             document.getElementById('lock-timer').innerText = "EXPIRED";
-            if (callback) {
-                setTimeout(callback, 1000);
+            
+            // Only fire callback if we aren't too far past the deadline 
+            // (e.g., if it's already 5s past, we probably already reloaded or are in a loop)
+            // AND ensure it only fires once.
+            if (!this.callbackFired && this.onExpireCallback) {
+                if (distance > -5000) { // 5 second grace period for drift
+                    console.log("Lock expired, triggering reload.");
+                    this.callbackFired = true;
+                    setTimeout(this.onExpireCallback, 1000);
+                } else {
+                    console.log("Lock significantly past expiry, skipping reload trigger to avoid loops.");
+                    this.callbackFired = true; // Mark as fired so we don't try again
+                }
             }
             return;
         }

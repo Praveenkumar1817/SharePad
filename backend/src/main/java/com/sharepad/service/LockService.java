@@ -53,17 +53,19 @@ public class LockService {
         if (existingLock.isPresent()) {
             NoteLock lock = existingLock.get();
             if (lock.getLockedBy().getId().equals(user.getId())) {
-                if (lock.getTotalLockMinutes() + 15 <= 60) {
+                if (lock.getTotalLockMinutes() + 15 <= 120) {
                     lock.setLockedUntil(lock.getLockedUntil().plusMinutes(15));
                     lock.setTotalLockMinutes(lock.getTotalLockMinutes() + 15);
                     lockRepository.save(lock);
                     return true;
                 } else {
-                    throw new RuntimeException("Maximum lock duration reached (60 mins)");
+                    throw new RuntimeException("Maximum lock duration reached (120 mins)");
                 }
+            } else {
+                throw new RuntimeException("This note is locked by another user");
             }
         }
-        return false;
+        throw new RuntimeException("No active lock found to extend");
     }
 
     @Transactional
