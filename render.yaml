@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: sharepad
+    env: docker
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: sharepad-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sharepad-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: sharepad-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: sharepad-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: sharepad-db
+          property: password
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://sharepad.onrender.com # Change this if you use a custom domain
+
+databases:
+  - name: sharepad-db
+    plan: free
+    region: oregon # or your preferred region
