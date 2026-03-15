@@ -7,8 +7,14 @@ const lockTimer = {
         this.stop();
         this.endTime = new Date(lockedUntilStr).getTime();
         this.onExpireCallback = onExpire || null;
-        this.updateDisplay();
+        
+        const now = new Date().getTime();
+        if (this.endTime <= now) {
+            console.log("Lock already expired, not starting timer.");
+            return;
+        }
 
+        this.updateDisplay();
         document.getElementById('lock-timer').classList.remove('hidden');
 
         this.intervalId = setInterval(() => {
