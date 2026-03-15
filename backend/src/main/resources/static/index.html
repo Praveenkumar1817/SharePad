@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sharepad</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- SockJS and Stomp -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+            <h1>sharepad</h1>
+            <span id="note-name-display"></span>
+            <span id="readonly-badge" class="badge readonly hidden">Read-Only</span>
+            <span id="locked-badge" class="badge locked hidden">Locked by <span id="locker-email"></span></span>
+        </div>
+        <div class="header-right">
+            <div id="auth-section">
+                <button id="login-btn" class="btn primary">Login with Google</button>
+                <div id="user-info" class="hidden">
+                    <span id="user-name"></span>
+                    <button id="logout-btn" class="btn outline">Logout</button>
+                </div>
+            </div>
+            <div id="action-section" class="hidden">
+                <button id="toggle-readonly-btn" class="btn outline" title="Note Owner Only">Toggle Read-Only</button>
+                <button id="lock-btn" class="btn warning">Lock (30m)</button>
+                <button id="extend-lock-btn" class="btn warning hidden">Extend Lock (15m)</button>
+                <button id="unlock-btn" class="btn outline hidden">Unlock</button>
+                <span id="lock-timer" class="hidden">00:00</span>
+                <div class="export-dropdown">
+                    <button class="btn info">Export ▼</button>
+                    <div class="export-content">
+                        <button id="export-txt-btn">TXT</button>
+                        <button id="export-md-btn">Markdown</button>
+                        <button id="export-pdf-btn">PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="welcome-screen" class="screen">
+            <h2>Welcome to sharepad</h2>
+            <p>Enter a note name to start collaborating.</p>
+            <div class="input-group">
+                <input type="text" id="note-name-input" placeholder="e.g. my-cool-note" />
+                <button id="go-to-note-btn" class="btn primary">Go</button>
+            </div>
+        </div>
+
+        <div id="editor-screen" class="screen hidden">
+            <textarea id="note-editor" placeholder="Start typing..."></textarea>
+        </div>
+    </main>
+
+    <script src="js/api.js?v=2"></script>
+    <script src="js/auth.js?v=2"></script>
+    <script src="js/lockTimer.js?v=2"></script>
+    <script src="js/websocket.js?v=2"></script>
+    <script src="js/editor.js?v=2"></script>
+</body>
+
+</html>

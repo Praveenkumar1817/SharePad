@@ -1,0 +1,12 @@
+/backend/target/
+/backend/apache-maven-3.9.6/
+/backend/*.log
+/backend/out-utf8.txt
+/backend/.out
+/backend/.run.log
+/backend/.run-utf8.log
+.DS_Store
+*.class
+*.log
+/backend/start-backend.ps1
+/backend/reset-postgres-password.ps1
