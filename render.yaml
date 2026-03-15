@@ -31,7 +31,7 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://sharepad.onrender.com # Change this if you use a custom domain
+        value: https://sharepad-87ll.onrender.com # Use the actual URL assigned by Render
 
 databases:
   - name: sharepad-db
