@@ -17,27 +17,25 @@ const ws = {
 
         this.stompClient.connect({}, (frame) => {
             console.log('Connected: ' + frame);
-            
-            // Wait slightly for internal state to catch up
-            setTimeout(() => {
-                if (this.stompClient && this.stompClient.connected) {
-                    this.stompClient.subscribe(`/topic/note/${noteKey}`, (message) => {
-                        const editMessage = JSON.parse(message.body);
-                        if (editMessage.senderEmail !== window.auth.user?.email) {
-                            this.onEditReceived(editMessage.content);
-                        }
-                    });
-                } else {
-                    console.error("WebSocket was connected but lost state immediately.");
-                }
-            }, 50);
+            if (this.stompClient && this.stompClient.connected) {
+                this.stompClient.subscribe(`/topic/note/${noteKey}`, (message) => {
+                    const editMessage = JSON.parse(message.body);
+                    if (editMessage.senderEmail !== window.auth.user?.email) {
+                        this.onEditReceived(editMessage.content);
+                    }
+                });
+            }
         });
     },
 
     disconnect() {
         if (this.stompClient !== null) {
-            if (this.stompClient.connected) {
-                this.stompClient.disconnect();
+            try {
+                if (this.stompClient.connected) {
+                    this.stompClient.disconnect();
+                }
+            } catch (e) {
+                console.warn("Error during stomp disconnect", e);
             }
             this.stompClient = null;
         }

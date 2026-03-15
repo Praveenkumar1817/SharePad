@@ -15,13 +15,19 @@ const api = {
 
     async lockNote(noteKey) {
         const response = await fetch(`${API_BASE_URL}/lock/${noteKey}`, { method: 'POST', credentials: 'include' });
-        if (!response.ok) throw new Error('Failed to lock note');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || 'Failed to lock note');
+        }
         return response.ok;
     },
 
     async extendLock(noteKey) {
         const response = await fetch(`${API_BASE_URL}/lock/${noteKey}/extend`, { method: 'POST', credentials: 'include' });
-        if (!response.ok) throw new Error('Failed to extend lock');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || 'Failed to extend lock');
+        }
         return response.ok;
     },
 
