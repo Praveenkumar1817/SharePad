@@ -3,9 +3,11 @@ const lockTimer = {
     endTime: null,
     onExpireCallback: null,
 
-    start(lockedUntilStr, onExpire) {
+    start(lockedUntilTimestamp, onExpire) {
         this.stop();
-        this.endTime = new Date(lockedUntilStr).getTime();
+        // Since we now receive Epoch millis (Long) from the backend, 
+        // we can pass it directly to new Date() or just use it as a number.
+        this.endTime = new Date(lockedUntilTimestamp).getTime();
         this.onExpireCallback = onExpire || null;
         this.callbackFired = false;
         

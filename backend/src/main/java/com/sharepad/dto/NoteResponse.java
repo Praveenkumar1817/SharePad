@@ -1,6 +1,5 @@
 package com.sharepad.dto;
 
-import java.time.LocalDateTime;
 
 public class NoteResponse {
     private String noteKey;
@@ -8,10 +7,10 @@ public class NoteResponse {
     private boolean locked;
     private String lockedByName;
     private String lockedByEmail;
-    private LocalDateTime lockedUntil;
+    private Long lockedUntil;
 
     public NoteResponse(String noteKey, String content, boolean locked, String lockedByName,
-            String lockedByEmail, LocalDateTime lockedUntil) {
+            String lockedByEmail, Long lockedUntil) {
         this.noteKey = noteKey;
         this.content = content;
         this.locked = locked;
@@ -35,6 +34,6 @@ public class NoteResponse {
     public String getLockedByEmail() { return lockedByEmail; }
     public void setLockedByEmail(String lockedByEmail) { this.lockedByEmail = lockedByEmail; }
 
-    public LocalDateTime getLockedUntil() { return lockedUntil; }
-    public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
+    public Long getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(Long lockedUntil) { this.lockedUntil = lockedUntil; }
 }

@@ -31,7 +31,7 @@ public class NoteController {
         boolean isLocked = lock.isPresent();
         String lockedByEmail = isLocked ? lock.get().getLockedBy().getEmail() : null;
         String lockedByName = isLocked ? maskEmail(lockedByEmail) : null;
-        java.time.LocalDateTime lockedUntil = isLocked ? lock.get().getLockedUntil() : null;
+        Long lockedUntilMillis = isLocked ? lock.get().getLockedUntil().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() : null;
 
         return ResponseEntity.ok(new NoteResponse(
                 note.getNoteKey(),
@@ -39,7 +39,7 @@ public class NoteController {
                 isLocked,
                 lockedByName,
                 lockedByEmail,
-                lockedUntil));
+                lockedUntilMillis));
     }
 
     private String maskEmail(String email) {
