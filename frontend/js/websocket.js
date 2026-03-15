@@ -7,7 +7,7 @@ const ws = {
         this.noteKey = noteKey;
         this.onEditReceived = onEditReceivedCallback;
 
-        const socket = new SockJS('http://localhost:8080/ws');
+        const socket = new SockJS('/ws');
         this.stompClient = Stomp.over(socket);
         this.stompClient.debug = null; // Disable debug logging
 
