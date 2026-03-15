@@ -4,6 +4,9 @@ const ws = {
     onEditReceived: null,
 
     connect(noteKey, onEditReceivedCallback) {
+        // Disconnect existing if any
+        this.disconnect();
+        
         this.noteKey = noteKey;
         this.onEditReceived = onEditReceivedCallback;
 
@@ -14,12 +17,20 @@ const ws = {
 
         this.stompClient.connect({}, (frame) => {
             console.log('Connected: ' + frame);
-            this.stompClient.subscribe(`/topic/note/${noteKey}`, (message) => {
-                const editMessage = JSON.parse(message.body);
-                if (editMessage.senderEmail !== window.auth.user?.email) {
-                    this.onEditReceived(editMessage.content);
+            
+            // Wait slightly for internal state to catch up
+            setTimeout(() => {
+                if (this.stompClient && this.stompClient.connected) {
+                    this.stompClient.subscribe(`/topic/note/${noteKey}`, (message) => {
+                        const editMessage = JSON.parse(message.body);
+                        if (editMessage.senderEmail !== window.auth.user?.email) {
+                            this.onEditReceived(editMessage.content);
+                        }
+                    });
+                } else {
+                    console.error("WebSocket was connected but lost state immediately.");
                 }
-            });
+            }, 50);
         });
     },
 
