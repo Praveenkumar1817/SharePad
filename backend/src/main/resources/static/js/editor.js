@@ -10,13 +10,11 @@ const goToNoteBtn = document.getElementById('go-to-note-btn');
 const editor = document.getElementById('note-editor');
 const noteNameDisplay = document.getElementById('note-name-display');
 
-const readonlyBadge = document.getElementById('readonly-badge');
 const lockedBadge = document.getElementById('locked-badge');
 
 const authSection = document.getElementById('auth-section');
 const actionSection = document.getElementById('action-section');
 
-const toggleReadonlyBtn = document.getElementById('toggle-readonly-btn');
 const lockBtn = document.getElementById('lock-btn');
 const extendLockBtn = document.getElementById('extend-lock-btn');
 const unlockBtn = document.getElementById('unlock-btn');
@@ -94,7 +92,6 @@ function updateUIBasedOnPermissions() {
     }
 
     // Badges
-    readonlyBadge.classList.toggle('hidden', !noteData.readOnly);
 
     if (noteData.locked) {
         lockedBadge.classList.remove('hidden');
@@ -105,12 +102,6 @@ function updateUIBasedOnPermissions() {
 
     // Determine editability
     let canEdit = true;
-
-    if (noteData.readOnly && (!isLogged || noteData.ownerEmail !== window.auth.user?.email)) {
-        // Technically backend checks owner ID, but for simplicity on frontend if readOnly we disable unless you unlock it.
-        // Actually, let backend enforce it, but frontend should disable text area
-        canEdit = false;
-    }
 
     if (!isLogged) canEdit = false;
 
@@ -161,12 +152,6 @@ exportTxtBtn.addEventListener('click', () => window.api.downloadExport(currentNo
 exportMdBtn.addEventListener('click', () => window.api.downloadExport(currentNoteKey, 'md'));
 exportPdfBtn.addEventListener('click', () => window.api.downloadExport(currentNoteKey, 'pdf'));
 
-toggleReadonlyBtn.addEventListener('click', async () => {
-    try {
-        await window.api.toggleReadOnly(currentNoteKey);
-        await loadNote(currentNoteKey);
-    } catch (e) { alert(e.message); }
-});
 
 lockBtn.addEventListener('click', async () => {
     try {

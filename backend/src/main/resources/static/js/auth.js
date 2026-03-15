@@ -3,7 +3,7 @@ const auth = {
 
     async checkAuth() {
         try {
-            const response = await fetch('/api/auth/me', { credentials: 'include' });
+            const response = await fetch('http://localhost:8080/api/auth/me', { credentials: 'include' });
             const data = await response.json();
 
             if (data.loggedIn) {
@@ -19,7 +19,7 @@ const auth = {
             } else {
                 this.user = null;
                 document.getElementById('login-btn').onclick = () => {
-                    window.location.href = data.url;
+                    window.location.href = `http://localhost:8080${data.url}`;
                 };
             }
         } catch (error) {
@@ -29,7 +29,7 @@ const auth = {
 
     logout() {
         // Form a POST request to Spring Security logout endpoint if CSRF is disabled
-        fetch('/logout', { method: 'POST', credentials: 'include' }).then(() => {
+        fetch('http://localhost:8080/logout', { method: 'POST', credentials: 'include' }).then(() => {
             window.location.reload();
         });
     }
