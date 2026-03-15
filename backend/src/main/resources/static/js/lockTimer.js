@@ -1,10 +1,12 @@
 const lockTimer = {
     intervalId: null,
     endTime: null,
+    onExpireCallback: null,
 
-    start(lockedUntilStr) {
+    start(lockedUntilStr, onExpire) {
         this.stop();
         this.endTime = new Date(lockedUntilStr).getTime();
+        this.onExpireCallback = onExpire || null;
         this.updateDisplay();
 
         document.getElementById('lock-timer').classList.remove('hidden');
@@ -19,6 +21,7 @@ const lockTimer = {
             clearInterval(this.intervalId);
             this.intervalId = null;
         }
+        this.onExpireCallback = null;
         document.getElementById('lock-timer').classList.add('hidden');
     },
 
@@ -27,10 +30,12 @@ const lockTimer = {
         const distance = this.endTime - now;
 
         if (distance <= 0) {
+            const callback = this.onExpireCallback;
             this.stop();
             document.getElementById('lock-timer').innerText = "EXPIRED";
-            // In a real app, trigger a refresh to show unlocked state
-            setTimeout(() => window.location.reload(), 2000);
+            if (callback) {
+                setTimeout(callback, 1000);
+            }
             return;
         }
 

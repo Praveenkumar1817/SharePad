@@ -29,7 +29,8 @@ public class NoteController {
         Optional<NoteLock> lock = lockService.getActiveLock(note);
 
         boolean isLocked = lock.isPresent();
-        String lockedByName = isLocked ? lock.get().getLockedBy().getName() : null;
+        String lockedByEmail = isLocked ? lock.get().getLockedBy().getEmail() : null;
+        String lockedByName = isLocked ? maskEmail(lockedByEmail) : null;
         java.time.LocalDateTime lockedUntil = isLocked ? lock.get().getLockedUntil() : null;
 
         return ResponseEntity.ok(new NoteResponse(
@@ -37,7 +38,18 @@ public class NoteController {
                 note.getContent(),
                 isLocked,
                 lockedByName,
+                lockedByEmail,
                 lockedUntil));
+    }
+
+    private String maskEmail(String email) {
+        if (email == null) return null;
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 1) return email;
+        int visibleChars = Math.min(4, atIndex - 1);
+        String prefix = email.substring(0, visibleChars);
+        String domain = email.substring(atIndex);
+        return prefix + "***" + domain;
     }
 
 }

@@ -95,7 +95,7 @@ function updateUIBasedOnPermissions() {
 
     if (noteData.locked) {
         lockedBadge.classList.remove('hidden');
-        document.getElementById('locker-email').textContent = noteData.lockedByEmail;
+        document.getElementById('locker-email').textContent = noteData.lockedByName;
     } else {
         lockedBadge.classList.add('hidden');
     }
@@ -107,11 +107,13 @@ function updateUIBasedOnPermissions() {
 
     isEditorLockedByMe = false;
     if (noteData.locked) {
-        if (isLogged && noteData.lockedByEmail === window.auth.user?.email) {
+        if (isLogged && noteData.lockedByEmail?.toLowerCase() === window.auth.user?.email?.toLowerCase()) {
             isEditorLockedByMe = true;
             canEdit = true;
-            // Setup lock UI
-            window.lockTimer.start(noteData.lockedUntil);
+            // Setup lock UI with auto-reload on expiry
+            window.lockTimer.start(noteData.lockedUntil, () => {
+                loadNote(currentNoteKey);
+            });
             lockBtn.classList.add('hidden');
             extendLockBtn.classList.remove('hidden');
             unlockBtn.classList.remove('hidden');
