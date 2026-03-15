@@ -25,6 +25,9 @@ const exportPdfBtn = document.getElementById('export-pdf-btn');
 
 // Initialization
 async function initialize() {
+    // Wait for auth to be determined before anything else
+    await window.auth.checkAuth();
+
     const path = window.location.pathname;
     const pathParts = path.split('/');
 
@@ -176,5 +179,5 @@ unlockBtn.addEventListener('click', async () => {
     } catch (e) { alert(e.message); }
 });
 
-// Wait slightly for auth check to complete if it's fast
-setTimeout(initialize, 500);
+// Start immediately
+initialize();

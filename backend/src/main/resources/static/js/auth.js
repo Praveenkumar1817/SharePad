@@ -3,7 +3,7 @@ const auth = {
 
     async checkAuth() {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/me', { credentials: 'include' });
+            const response = await fetch('/api/auth/me', { credentials: 'include' });
             const data = await response.json();
 
             if (data.loggedIn) {
@@ -19,7 +19,7 @@ const auth = {
             } else {
                 this.user = null;
                 document.getElementById('login-btn').onclick = () => {
-                    window.location.href = `http://localhost:8080${data.url}`;
+                    window.location.href = data.url;
                 };
             }
         } catch (error) {
@@ -29,7 +29,7 @@ const auth = {
 
     logout() {
         // Form a POST request to Spring Security logout endpoint if CSRF is disabled
-        fetch('http://localhost:8080/logout', { method: 'POST', credentials: 'include' }).then(() => {
+        fetch('/logout', { method: 'POST', credentials: 'include' }).then(() => {
             window.location.reload();
         });
     }
@@ -37,6 +37,6 @@ const auth = {
 
 document.getElementById('logout-btn').addEventListener('click', () => auth.logout());
 
-// Initial check
-auth.checkAuth();
+// Initial check is now handled via explicit call or deferred in main apps
+// auth.checkAuth(); 
 window.auth = auth;
