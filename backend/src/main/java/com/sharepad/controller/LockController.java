@@ -27,11 +27,17 @@ public class LockController {
         if (token == null)
             return ResponseEntity.status(401).build();
         User user = authService.getOrCreateUser(token);
-        boolean success = lockService.lockNote(noteKey, user);
-        if (success) {
-            return ResponseEntity.ok().build();
+        try {
+            boolean success = lockService.lockNote(noteKey, user);
+            if (success) {
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(409).body(Map.of("error", "Note is already locked by another user"));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body(Map.of("error", "Note is already locked by another user"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "An error occurred while locking the note"));
         }
-        return ResponseEntity.badRequest().body(Map.of("error", "Could not lock note"));
     }
 
     @PostMapping("/{noteKey}/extend")
