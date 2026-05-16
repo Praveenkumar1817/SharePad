@@ -1,9 +1,13 @@
+const AUTH_BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://sharepad-87ll.onrender.com';
+
 const auth = {
     user: null,
 
     async checkAuth() {
         try {
-            const response = await fetch('/api/auth/me', { credentials: 'include' });
+            const response = await fetch(`${AUTH_BACKEND_URL}/api/auth/me`, { credentials: 'include' });
             const data = await response.json();
 
             if (data.loggedIn) {
@@ -29,7 +33,7 @@ const auth = {
 
     logout() {
         // Form a POST request to Spring Security logout endpoint if CSRF is disabled
-        fetch('/logout', { method: 'POST', credentials: 'include' }).then(() => {
+        fetch(`${AUTH_BACKEND_URL}/logout`, { method: 'POST', credentials: 'include' }).then(() => {
             window.location.reload();
         });
     }

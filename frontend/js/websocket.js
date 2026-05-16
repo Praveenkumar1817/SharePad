@@ -10,7 +10,9 @@ const ws = {
         this.noteKey = noteKey;
         this.onEditReceived = onEditReceivedCallback;
 
-        const url = `${window.location.protocol}//${window.location.host}/ws`;
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const wsBackend = isLocal ? `${window.location.protocol}//${window.location.host}` : 'https://sharepad-87ll.onrender.com';
+        const url = `${wsBackend}/ws`;
         const socket = new SockJS(url);
         this.stompClient = Stomp.over(socket);
         this.stompClient.debug = null; // Disable debug logging
