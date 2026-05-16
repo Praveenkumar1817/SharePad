@@ -24,7 +24,7 @@ spring:
 
   sql:
     init:
-      mode: always # runs schema.sql
+      mode: never # Hibernate ddl-auto:update manages schema; schema.sql kept for reference only
 
   security:
     oauth2:
