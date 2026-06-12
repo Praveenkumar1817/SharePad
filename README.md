@@ -1,47 +1,104 @@
-# SharePad
+<div align="center">
 
-A real-time collaborative note-taking application that lets multiple users view and edit shared notes simultaneously. Notes are accessed by a unique name, and users can optionally lock a note to prevent concurrent edits.
+# 📝 SharePad
 
-## Features
+**Real-time collaborative note-taking — open a note, share the link, start writing together.**
 
-- **Real-time collaboration** – Multiple users can edit the same note at the same time using WebSocket (STOMP over SockJS).
-- **Named notes** – Any note is reachable by its unique key (e.g. `/#my-cool-note`). Notes are created automatically on first access.
-- **Google OAuth2 authentication** – Sign in with a Google account to unlock write and lock features.
-- **Note locking** – An authenticated user can lock a note for 30 minutes to gain exclusive edit rights. The lock can be extended in 15-minute increments up to a maximum of 120 minutes and released early at any time.
-- **Export** – Download a note as plain text (`.txt`), Markdown (`.md`), or PDF.
-- **Auto-cleanup** – Expired locks are automatically removed every minute.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-sharepad--nu.vercel.app-blue?style=for-the-badge&logo=vercel)](https://sharepad-nu.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://sharepad-87ll.onrender.com)
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk)](https://openjdk.org/projects/jdk/17/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-6DB33F?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
-## Technology Stack
+</div>
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| ⚡ **Real-time collaboration** | Multiple users edit the same note simultaneously via WebSocket (STOMP over SockJS) |
+| 🔗 **Named notes** | Any note is reachable by its unique key — just visit `/#my-note`. Created automatically on first access |
+| 🔐 **Google OAuth2** | Sign in with Google to unlock write, lock, and export features |
+| 🔒 **Note locking** | Lock a note for 30 minutes for exclusive edit rights. Extend in 15-min increments (max 120 min) or release early |
+| 📤 **Export** | Download any note as `.txt`, `.md`, or `.pdf` |
+| 🧹 **Auto-cleanup** | Expired locks are purged automatically every 60 seconds |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Browser (Client)                   │
+│  HTML + CSS + Vanilla JS (served via Vercel)         │
+│                                                      │
+│   ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
+│   │  auth.js │  │  api.js  │  │  websocket.js    │  │
+│   └────┬─────┘  └────┬─────┘  └────────┬─────────┘  │
+└────────┼─────────────┼─────────────────┼────────────┘
+         │  OAuth2     │  REST API        │  WebSocket
+         ▼             ▼                 ▼
+┌─────────────────────────────────────────────────────┐
+│             Spring Boot Backend (Render)              │
+│                                                      │
+│  ┌──────────────┐  ┌─────────────┐  ┌────────────┐  │
+│  │ SecurityConfig│  │  Controllers│  │  WS Broker │  │
+│  │ (OAuth2/CORS) │  │  (REST API) │  │  (STOMP)   │  │
+│  └──────────────┘  └──────┬──────┘  └─────┬──────┘  │
+│                            │               │          │
+│              ┌─────────────▼───────────────▼──────┐  │
+│              │      Services (Business Logic)      │  │
+│              │  NoteService │ LockService │ ...    │  │
+│              └──────────────────────┬─────────────┘  │
+└─────────────────────────────────────┼────────────────┘
+                                      │ JPA
+                                      ▼
+                          ┌─────────────────────┐
+                          │  PostgreSQL (Render) │
+                          │  users / notes /     │
+                          │  note_locks          │
+                          └─────────────────────┘
+```
+
+---
+
+## 🛠️ Technology Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Java 17, Spring Boot 3.2.3 |
-| Persistence | Spring Data JPA, PostgreSQL |
-| Authentication | Spring Security, OAuth2 (Google) |
-| Real-time | Spring WebSocket, STOMP, SockJS |
-| Frontend | Vanilla HTML / CSS / JavaScript |
-| Containerisation | Docker (multi-stage build) |
-| Deployment | Render.com |
+| **Frontend** | Vanilla HTML5 / CSS3 / JavaScript (ES6+) |
+| **Backend** | Java 17, Spring Boot 3.2.3 |
+| **Real-time** | Spring WebSocket, STOMP protocol, SockJS |
+| **Persistence** | Spring Data JPA, PostgreSQL 14 |
+| **Authentication** | Spring Security, OAuth2 (Google) |
+| **Containerisation** | Docker (multi-stage build) |
+| **Frontend Hosting** | Vercel |
+| **Backend Hosting** | Render (Docker web service + managed PostgreSQL) |
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 SharePad/
 ├── Dockerfile                  # Multi-stage Docker build
-├── render.yaml                 # Render.com deployment config
+├── render.yaml                 # Render.com deployment blueprint
 ├── backend/
 │   ├── pom.xml
 │   └── src/main/
 │       ├── java/com/sharepad/
 │       │   ├── SharePadApplication.java
 │       │   ├── config/
-│       │   │   ├── SecurityConfig.java   # Spring Security & OAuth2 setup
-│       │   │   └── WebSocketConfig.java  # STOMP broker configuration
+│       │   │   ├── SecurityConfig.java      # Spring Security & CORS
+│       │   │   └── WebSocketConfig.java     # STOMP broker config
 │       │   ├── controller/
-│       │   │   ├── AuthController.java   # GET /api/auth/me
-│       │   │   ├── ExportController.java # GET /api/export/{noteKey}?format=
-│       │   │   ├── LockController.java   # POST /api/lock/{noteKey}[/extend|/unlock]
-│       │   │   └── NoteController.java   # GET /api/notes/{noteKey}
+│       │   │   ├── AuthController.java      # GET /api/auth/me
+│       │   │   ├── ExportController.java    # GET /api/export/{noteKey}
+│       │   │   ├── LockController.java      # POST /api/lock/{noteKey}
+│       │   │   └── NoteController.java      # GET /api/notes/{noteKey}
 │       │   ├── dto/
 │       │   │   ├── LoginResponse.java
 │       │   │   └── NoteResponse.java
@@ -63,20 +120,45 @@ SharePad/
 │       │       └── NoteWebSocketController.java
 │       └── resources/
 │           ├── application.yml
-│           └── schema.sql
+│           └── schema.sql              # Reference schema (managed by Hibernate)
 └── frontend/
     ├── index.html
+    ├── vercel.json                     # Vercel static site config
     ├── css/
     │   └── style.css
     └── js/
         ├── api.js          # REST API calls
-        ├── auth.js         # Authentication helpers
+        ├── auth.js         # Google OAuth2 helpers
         ├── editor.js       # Main editor logic & UI state
         ├── lockTimer.js    # Countdown timer for active lock
         └── websocket.js    # STOMP/SockJS client
 ```
 
-## Database Schema
+---
+
+## 🔌 REST API
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `GET` | `/api/auth/me` | ✗ | Returns current user info and Google login URL |
+| `GET` | `/api/notes/{noteKey}` | ✗ | Fetch (or auto-create) a note by key |
+| `GET` | `/api/export/{noteKey}?format={txt\|md\|pdf}` | ✗ | Download note in the requested format |
+| `POST` | `/api/lock/{noteKey}` | ✓ | Lock the note for 30 minutes |
+| `POST` | `/api/lock/{noteKey}/extend` | ✓ | Extend active lock by 15 minutes (max 120 min) |
+| `POST` | `/api/lock/{noteKey}/unlock` | ✓ | Release the lock early |
+| `POST` | `/logout` | ✓ | Sign out |
+
+### WebSocket (STOMP over SockJS)
+
+| Destination | Direction | Description |
+|-------------|-----------|-------------|
+| `/ws` | Handshake | SockJS WebSocket connection entry point |
+| `/app/note/{noteKey}/edit` | Client → Server | Publish a content update |
+| `/topic/note/{noteKey}` | Server → Client | Receive live content updates from other users |
+
+---
+
+## 🗄️ Database Schema
 
 ```sql
 -- OAuth2 users
@@ -99,42 +181,24 @@ CREATE TABLE notes (
 
 -- Active locks
 CREATE TABLE note_locks (
-    id                BIGSERIAL PRIMARY KEY,
-    note_id           BIGINT REFERENCES notes(id) ON DELETE CASCADE,
-    locked_by         VARCHAR(255) REFERENCES users(id),
-    locked_until      TIMESTAMP NOT NULL,
+    id                 BIGSERIAL PRIMARY KEY,
+    note_id            BIGINT REFERENCES notes(id) ON DELETE CASCADE,
+    locked_by          VARCHAR(255) REFERENCES users(id),
+    locked_until       TIMESTAMP NOT NULL,
     total_lock_minutes INT DEFAULT 0
 );
 ```
 
-## REST API
+---
 
-| Method | Endpoint | Auth required | Description |
-|--------|----------|:-------------:|-------------|
-| `GET` | `/api/auth/me` | No | Returns current user info and login URL |
-| `GET` | `/api/notes/{noteKey}` | No | Fetch or create a note |
-| `GET` | `/api/export/{noteKey}?format={txt\|md\|pdf}` | No | Download note in the requested format |
-| `POST` | `/api/lock/{noteKey}` | Yes | Lock the note for 30 minutes |
-| `POST` | `/api/lock/{noteKey}/extend` | Yes | Extend an existing lock by 15 minutes (max 120 min total) |
-| `POST` | `/api/lock/{noteKey}/unlock` | Yes | Release the lock early |
-| `POST` | `/logout` | Yes | Sign out |
-
-### WebSocket
-
-| Endpoint | Type | Description |
-|----------|------|-------------|
-| `/ws` | SockJS handshake | WebSocket connection entry point |
-| `/app/note/{noteKey}/edit` | STOMP send | Publish a content update |
-| `/topic/note/{noteKey}` | STOMP subscribe | Receive content updates from other users |
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Java 17+
 - Maven 3.9+
 - PostgreSQL 14+
-- A Google OAuth2 application (Client ID and Secret)
+- A Google OAuth2 application (Client ID + Secret)
 
 ### Local Development
 
@@ -144,13 +208,12 @@ CREATE TABLE note_locks (
    cd SharePad
    ```
 
-2. **Configure the database**
-
-   Create a local PostgreSQL database named `sharepad` and a user with access to it, or adjust the defaults in `backend/src/main/resources/application.yml`.
+2. **Create the local database**
+   ```bash
+   psql -U postgres -c "CREATE DATABASE sharepad;"
+   ```
 
 3. **Set environment variables**
-
-   The application reads the following environment variables (defaults are shown in brackets):
 
    | Variable | Default | Description |
    |---|---|---|
@@ -159,29 +222,33 @@ CREATE TABLE note_locks (
    | `DB_NAME` | `sharepad` | Database name |
    | `DB_USER` | `postgres` | Database user |
    | `DB_PASS` | `postgres` | Database password |
-   | `GOOGLE_CLIENT_ID` | – | Google OAuth2 client ID |
-   | `GOOGLE_CLIENT_SECRET` | – | Google OAuth2 client secret |
+   | `GOOGLE_CLIENT_ID` | — | Google OAuth2 client ID |
+   | `GOOGLE_CLIENT_SECRET` | — | Google OAuth2 client secret |
    | `FRONTEND_URL` | `http://localhost:5500` | Allowed CORS origin |
 
-   Export them in your shell or add them to an `.env` file sourced before running the app.
+   ```bash
+   export GOOGLE_CLIENT_ID=your_client_id
+   export GOOGLE_CLIENT_SECRET=your_client_secret
+   ```
 
 4. **Build and run the backend**
    ```bash
    cd backend
    mvn spring-boot:run
    ```
-   The server starts on port `8080`. The frontend is served as static content at `http://localhost:8080`.
+   The server starts on **port 8080**. The frontend is served as static content at `http://localhost:8080`.
 
-5. **Optional – serve the frontend separately**
+5. **Optional — serve the frontend separately** (e.g. with VS Code Live Server on port 5500)
 
-   Open `frontend/index.html` with a local HTTP server (e.g. VS Code Live Server on port 5500). Make sure `FRONTEND_URL` is set accordingly so CORS is allowed.
+   Open `frontend/index.html` with any local HTTP server. Make sure `FRONTEND_URL` includes `http://localhost:5500` so CORS is allowed.
 
 ### Docker
 
-Build and run the entire application in one container:
+Build and run everything in a single container:
 
 ```bash
 docker build -t sharepad .
+
 docker run -p 8080:8080 \
   -e DB_HOST=<host> \
   -e DB_PORT=5432 \
@@ -193,43 +260,69 @@ docker run -p 8080:8080 \
   sharepad
 ```
 
-The application will be available at `http://localhost:8080`.
+App will be available at `http://localhost:8080`.
 
-## Deployment on Render
+---
 
-The repository includes a `render.yaml` Blueprint that provisions:
+## ☁️ Deployment
 
-- A **Web Service** running the Docker image
-- A managed **PostgreSQL** database (`sharepad-db`)
+SharePad uses a **split deployment** strategy:
 
-Steps:
+| Layer | Platform | URL |
+|---|---|---|
+| Frontend (static) | **Vercel** | https://sharepad-nu.vercel.app |
+| Backend (Docker) | **Render** | https://sharepad-87ll.onrender.com |
+| Database | **Render** (managed PostgreSQL) | — |
 
-1. Fork or push this repository to GitHub.
-2. In the Render dashboard, create a new **Blueprint** and connect the repository.
-3. Set the two secrets that are not synced automatically:
+### Deploy Backend to Render
+
+The `render.yaml` blueprint provisions both the web service and the database automatically:
+
+1. Push this repository to GitHub.
+2. In the Render dashboard → **New Blueprint** → connect the repo.
+3. Set the two secrets manually in the Render dashboard:
    - `GOOGLE_CLIENT_ID`
    - `GOOGLE_CLIENT_SECRET`
-4. Update `FRONTEND_URL` in `render.yaml` (or the Render dashboard) to the URL assigned to your web service.
-5. Add the Render callback URL to your Google OAuth2 application's **Authorised redirect URIs**:
+4. Set `FRONTEND_URL` to your Vercel URL (e.g. `https://sharepad-nu.vercel.app`).
+5. Add the Render callback URL to your Google OAuth2 app's **Authorised redirect URIs**:
    ```
    https://<your-service>.onrender.com/login/oauth2/code/google
    ```
 
-## Google OAuth2 Setup
+### Deploy Frontend to Vercel
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create (or select) a project and navigate to **APIs & Services → Credentials**.
-3. Create an **OAuth 2.0 Client ID** of type *Web application*.
-4. Add the following **Authorised redirect URIs**:
-   - `http://localhost:8080/login/oauth2/code/google` (for local development)
-   - `https://<your-render-service>.onrender.com/login/oauth2/code/google` (for production)
-5. Copy the **Client ID** and **Client Secret** into the corresponding environment variables.
+```bash
+npx vercel deploy frontend/ --prod --yes
+```
 
-## How It Works
+Or connect the GitHub repo to Vercel and set the **Root Directory** to `frontend/`.
+
+---
+
+## 🔑 Google OAuth2 Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials**.
+2. Create an **OAuth 2.0 Client ID** of type *Web application*.
+3. Add **Authorised redirect URIs**:
+   ```
+   http://localhost:8080/login/oauth2/code/google
+   https://<your-render-service>.onrender.com/login/oauth2/code/google
+   ```
+4. Copy the **Client ID** and **Client Secret** into your environment variables.
+
+---
+
+## ⚙️ How It Works
 
 1. A user visits the app and enters a note name (or follows a direct link like `/#my-note`).
-2. The frontend calls `GET /api/notes/{noteKey}` to load or create the note and fetch its current lock state.
-3. A WebSocket connection is opened to `/ws`. The client subscribes to `/topic/note/{noteKey}` to receive live updates.
-4. Every keystroke is sent over STOMP to `/app/note/{noteKey}/edit`. The server broadcasts the new content to all other subscribers.
-5. An authenticated user can lock the note. While locked, only the lock owner can edit; other users see the editor in read-only mode and a "Locked by …" badge.
-6. Locks expire automatically after the configured duration and are cleaned up server-side every 60 seconds.
+2. The frontend calls `GET /api/notes/{noteKey}` to load or create the note, including its current lock state.
+3. A WebSocket connection is opened to `/ws`. The client subscribes to `/topic/note/{noteKey}` for live updates.
+4. Every keystroke is published over STOMP to `/app/note/{noteKey}/edit`. The server broadcasts the new content to all other subscribers on that topic.
+5. An authenticated user can lock the note. While locked, only the lock owner can edit; others see the editor in read-only mode with a **"Locked by …"** badge.
+6. Locks expire automatically and are cleaned up server-side every 60 seconds.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
