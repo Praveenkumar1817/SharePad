@@ -26,7 +26,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disabled for simplicity in non-session REST APIs & WS, though OAuth2
                                               // uses sessions typically
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/notes/{noteKey}", "/ws/**", "/api/auth/me", "/", "/index.html", "/css/**", "/js/**").permitAll()
+                        // Public API endpoints
+                        .requestMatchers("/api/auth/me", "/api/notes/{noteKey}").permitAll()
+                        // WebSocket
+                        .requestMatchers("/ws/**").permitAll()
+                        // Static frontend assets (SPA served by Spring Boot)
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico", "/error", "/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/index.html", true));
