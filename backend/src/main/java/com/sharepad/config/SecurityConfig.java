@@ -19,22 +19,26 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;
 
+    // After OAuth login, send the user back to the frontend (Vercel), not the backend
+    @Value("${frontend.redirect-url:https://sharepad-nu.vercel.app}")
+    private String frontendRedirectUrl;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable()) // Disabled for simplicity in non-session REST APIs & WS, though OAuth2
-                                              // uses sessions typically
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         // Public API endpoints
                         .requestMatchers("/api/auth/me", "/api/notes/{noteKey}").permitAll()
                         // WebSocket
                         .requestMatchers("/ws/**").permitAll()
-                        // Static frontend assets (SPA served by Spring Boot)
-                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico", "/error", "/**").permitAll()
+                        // All other paths — static assets and SPA handled by WebConfig
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/index.html", true));
+                        // Redirect to Vercel frontend after successful Google login
+                        .defaultSuccessUrl(frontendRedirectUrl, true));
         return http.build();
     }
 

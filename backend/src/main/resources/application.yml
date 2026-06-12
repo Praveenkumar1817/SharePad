@@ -1,6 +1,11 @@
 server:
   port: 8080
   forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        same-site: none   # Required for cross-site requests from Vercel frontend
+        secure: true      # Required when SameSite=None
 
 logging:
   level:
@@ -39,3 +44,6 @@ spring:
 
 cors:
   allowed-origins: ${FRONTEND_URL:http://localhost:5500,http://127.0.0.1:5500}
+
+frontend:
+  redirect-url: ${FRONTEND_URL:http://localhost:5500}
