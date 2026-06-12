@@ -5,6 +5,7 @@ services:
     dockerContext: .
     dockerfilePath: ./Dockerfile
     plan: free
+    healthCheckPath: /api/auth/me
     envVars:
       - key: DB_HOST
         fromDatabase:
@@ -31,9 +32,9 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://sharepad-87ll.onrender.com # Use the actual URL assigned by Render
+        sync: false  # Set this AFTER deploy to your Vercel URL e.g. https://sharepad-nu.vercel.app
 
 databases:
   - name: sharepad-db
     plan: free
-    region: oregon # or your preferred region
+    region: oregon
