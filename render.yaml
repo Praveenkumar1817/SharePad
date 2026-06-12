@@ -2,6 +2,7 @@ services:
   - type: web
     name: sharepad
     env: docker
+    region: oregon
     dockerContext: .
     dockerfilePath: ./Dockerfile
     plan: free
