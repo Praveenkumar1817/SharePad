@@ -11,6 +11,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -42,10 +43,37 @@ public class SecurityConfig {
         return http.build();
     }
 
+    private List<String> getSanitizedAllowedOrigins() {
+        List<String> origins = new java.util.ArrayList<>();
+        if (allowedOrigins != null) {
+            for (String origin : allowedOrigins) {
+                if (origin != null && !origin.trim().isEmpty()) {
+                    String trimmed = origin.trim();
+                    origins.add(trimmed);
+                    if (trimmed.endsWith("/")) {
+                        origins.add(trimmed.substring(0, trimmed.length() - 1));
+                    } else {
+                        origins.add(trimmed + "/");
+                    }
+                }
+            }
+        }
+        // Always allow localhost and 127.0.0.1 for local testing
+        if (!origins.contains("http://localhost:5500")) {
+            origins.add("http://localhost:5500");
+            origins.add("http://localhost:5500/");
+        }
+        if (!origins.contains("http://127.0.0.1:5500")) {
+            origins.add("http://127.0.0.1:5500");
+            origins.add("http://127.0.0.1:5500/");
+        }
+        return origins;
+    }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        configuration.setAllowedOrigins(getSanitizedAllowedOrigins());
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

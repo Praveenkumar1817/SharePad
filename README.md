@@ -5,7 +5,7 @@
 **Real-time collaborative note-taking — open a note, share the link, start writing together.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-sharepad--nu.vercel.app-blue?style=for-the-badge&logo=vercel)](https://sharepad-nu.vercel.app)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://sharepad-87ll.onrender.com)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://sharepad-y829.onrender.com)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-6DB33F?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
@@ -271,7 +271,7 @@ SharePad uses a **split deployment** strategy:
 | Layer | Platform | URL |
 |---|---|---|
 | Frontend (static) | **Vercel** | https://sharepad-nu.vercel.app |
-| Backend (Docker) | **Render** | https://sharepad-87ll.onrender.com |
+| Backend (Docker) | **Render** | https://sharepad-y829.onrender.com |
 | Database | **Render** (managed PostgreSQL) | — |
 
 ### Deploy Backend to Render

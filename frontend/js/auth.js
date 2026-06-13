@@ -1,6 +1,6 @@
 const AUTH_BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? ''
-    : 'https://sharepad-87ll.onrender.com';
+    : 'https://sharepad-y829.onrender.com';
 
 const auth = {
     user: null,
@@ -23,7 +23,8 @@ const auth = {
             } else {
                 this.user = null;
                 document.getElementById('login-btn').onclick = () => {
-                    window.location.href = data.url;
+                    const loginUrl = data.url.startsWith('http') ? data.url : `${AUTH_BACKEND_URL}${data.url}`;
+                    window.location.href = loginUrl;
                 };
             }
         } catch (error) {
